@@ -15,7 +15,7 @@ inputs:
 outputs:
   terraform-execution-role-arn:
     description: "The ARN of the Terraform execution IAM role"
-    value: 'something'
+    value: ${{ steps.describe-cloudformation-stack.outputs.terraform-execution-role-arn }}
   terraform-state-bucket-name:
     description: "The name of the S3 bucket that stores the Terraform state file"
     value: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-bucket-name }}
@@ -33,6 +33,7 @@ runs:
         aws-region: ${{ inputs.aws-region }}
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         command: |
+          echo "terraform-execution-role-arn=something" >> $GITHUB_OUTPUT          
           STACK_OUTPUT=$(
             aws cloudformation describe-stacks \
             --stack-name ${{ inputs.stack-name }} \
