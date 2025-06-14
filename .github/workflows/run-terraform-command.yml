@@ -2,18 +2,6 @@ name: run-terraform-command
 on:
   workflow_call:
     inputs:
-      terraform-execution-role-arn:
-        required: true
-        type: string
-      aws-region:
-        required: true
-        type: string
-      terraform-state-bucket-name:
-        required: true
-        type: string
-      terraform-state-lock-table-name:
-        required: true
-        type: string
       terraform-command:
         required: true
         type: string
@@ -22,14 +10,23 @@ jobs:
     name: Run Terraform command
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Run Terraform command
+      - name: Get CloudFormation stack name
+        id: get-cloudformation-stack-name
+        uses: ./.github/actions/get-cloudformation-stack-name
+      - name: Describe CloudFormation stack
+        id: describe-cloudformation-stack
+        uses: ./.github/actions/describe-cloudformation-stack
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          stack-name: ${{ steps.get-cloudformation-stack-name.outputs.stack-name }}
+      - name: Run Terraform apply
         uses: ./.github/actions/configure-terraform-and-run-command
         with:
-          aws-region: ${{ inputs.aws-region }}
-          terraform-execution-role-arn: ${{ inputs.terraform-execution-role-arn }}
+          aws-region: ${{ vars.AWS_REGION }}
           terraform-command: ${{ inputs.terraform-command }}
-          terraform-state-bucket-name: ${{ inputs.terraform-state-bucket-name }}
-          terraform-state-lock-table-name: ${{ inputs.terraform-state-lock-table-name }}
           terraform-directory: ./terraform
+          terraform-execution-role-arn: ${{ steps.describe-cloudformation-stack.outputs.terraform-execution-role-arn }}
+          terraform-state-bucket-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-bucket-name }}
+          terraform-state-lock-table-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-lock-table-name }}
