@@ -1,0 +1,41 @@
+name: "Configure Terraform environment and run command"
+inputs:
+  terraform-execution-role-arn:
+    description: "The ARN of the Terraform execution role created using the CloudFormation stack."
+    required: true
+  aws-region:
+    description: "The AWS region for the Terraform backend and AWS providers"
+    required: true
+  terraform-command:
+    description: "The Terraform command to execute"
+    required: true
+  terraform-state-bucket-name:
+    description: "The name of the Terraform state S3 bucket"
+    required: true
+  terraform-state-lock-table-name:
+    description: "The name of the Terraform state-lock DynamoDB table"
+    required: true
+  terraform-directory:
+    description: "The directory where the Terraform command will be executed"
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+    - name: Configure AWS credentials using OIDC
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: ${{ inputs.terraform-execution-role-arn }}
+        aws-region: ${{ inputs.aws-region }}
+    - name: Initialise Terraform
+      run: |
+        terraform init \
+          -backend-config="bucket=${{ inputs.terraform-state-bucket-name }}" \
+          -backend-config="dynamodb_table=${{ inputs.terraform-state-lock-table-name }}" \
+      shell: bash
+      working-directory: ${{ inputs.terraform-directory }}
+    - name: Run Terraform command
+      run: ${{ inputs.terraform-command }}
+      working-directory: ${{ inputs.terraform-directory }}
+      shell: bash
