@@ -28,7 +28,6 @@ runs:
     - name: Describe CloudFormation Stack
       id: describe-cloudformation-stack
       uses: ./.github/actions/configure-aws-cli-and-run-command
-      shell: bash
       with:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-region: ${{ inputs.aws-region }}
