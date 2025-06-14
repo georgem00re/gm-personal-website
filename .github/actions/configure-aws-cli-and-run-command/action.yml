@@ -24,4 +24,6 @@ runs:
     - name: Execute AWS CLI command
       shell: bash
       run: |
-        eval "${{ inputs.command }}"
+        echo "${{ inputs.command }}" > temp-cmd.sh
+        chmod +x temp-cmd.sh
+        ./temp-cmd.sh
