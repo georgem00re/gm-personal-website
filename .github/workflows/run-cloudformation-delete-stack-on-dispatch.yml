@@ -1,0 +1,12 @@
+name: run-cloudformation-delete-stack-on-dispatch
+on:
+  workflow_dispatch:
+jobs:
+  run-cloudformation-delete-stack:
+    name: Run CloudFormation delete stack
+    uses: ./.github/workflows/run-cloudformation-delete-stack.yml
+    with:
+      aws-region: ${{ vars.AWS_REGION }}
+    secrets:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

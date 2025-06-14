@@ -1,0 +1,19 @@
+name: "Get CloudFormation stack name"
+outputs:
+  stack-name:
+    description: ""
+    value: ${{ steps.output-cloudformation-stack-name.outputs.stack-name }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get repository name and owner
+      id: get-repository-name-and-owner
+      uses: ./.github/actions/get-repository-name-and-owner
+    - name: Output CloudFormation stack name
+      id: output-cloudformation-stack-name
+      shell: bash
+      run: |
+        OWNER="${{ steps.get-repository-name-and-owner.outputs.repository-owner }}"
+        REPO="${{ steps.get-repository-name-and-owner.outputs.repository-name }}"
+        STACK_NAME="${OWNER}-${REPO}-cloudformation-stack"
+        echo "stack-name=${STACK_NAME}" >> "$GITHUB_OUTPUT"

@@ -1,0 +1,12 @@
+name: run-cloudformation-deploy-on-dispatch
+on:
+  workflow_dispatch:
+jobs:
+  run-cloudformation-deploy:
+    name: Run CloudFormation deploy
+    uses: ./.github/workflows/run-cloudformation-deploy.yml
+    with:
+      aws-region: ${{ vars.AWS_REGION }}
+    secrets:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

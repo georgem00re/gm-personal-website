@@ -1,0 +1,41 @@
+name: run-cloudformation-deploy
+on:
+  workflow_call:
+    inputs:
+      aws-region:
+        required: true
+        type: string
+    secrets:
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+jobs:
+  cloudformation-deploy:
+    name: Deploy CloudFormation template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup CloudFormation environment
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: ${{ inputs.aws-region }}
+      - name: Get repository name and owner
+        id: get-repository-name-and-owner
+        uses: ./.github/actions/get-repository-name-and-owner
+      - name: Get CloudFormation stack name
+        id: get-cloudformation-stack-name
+        uses: ./.github/actions/get-cloudformation-stack-name
+      - name: Run CloudFormation deploy
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: ${{ steps.get-cloudformation-stack-name.outputs.stack-name }}
+          template: cloudformation-templates/main.yml
+          no-fail-on-empty-changeset: "1"
+          parameter-overrides: >
+            RepositoryName=${{ steps.get-repository-name-and-owner.outputs.repository-name }},
+            RepositoryOwner=${{ steps.get-repository-name-and-owner.outputs.repository-owner }}
+          capabilities: "CAPABILITY_NAMED_IAM"
