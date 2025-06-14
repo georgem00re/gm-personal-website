@@ -1,10 +1,12 @@
-name: run-terraform-apply-on-dispath
+name: run-terraform-apply-on-dispatch
 on:
   workflow_dispatch:
 jobs:
   run-terraform-apply:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Get CloudFormation stack name
         id: get-cloudformation-stack-name
         uses: ./.github/actions/get-cloudformation-stack-name
