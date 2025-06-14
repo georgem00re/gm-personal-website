@@ -1,4 +1,4 @@
-name: run-terraform-apply-on-dispatch
+name: run-terraform-destroy-on-dispatch
 on:
   workflow_dispatch:
 permissions:
