@@ -39,10 +39,6 @@ runs:
             --query "Stacks[0].Outputs" \
             --output json
           )
-          
-          echo "DEBUG: Full stack outputs:"
-          echo "$STACK_OUTPUT" | jq .
-          
           TERRAFORM_EXECUTION_ROLE_ARN=$(echo "$STACK_OUTPUT" | jq -r '.[] | select(.OutputKey=="TerraformExecutionRoleArn") | .OutputValue')
           TERRAFORM_STATE_BUCKET_NAME=$(echo "$STACK_OUTPUT" | jq -r '.[] | select(.OutputKey=="TerraformStateBucketName") | .OutputValue')
           TERRAFORM_STATE_LOCK_TABLE_NAME=$(echo "$STACK_OUTPUT" | jq -r '.[] | select(.OutputKey=="TerraformStateLockTableName") | .OutputValue')
