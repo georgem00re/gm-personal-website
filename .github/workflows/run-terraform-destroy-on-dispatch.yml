@@ -1,0 +1,16 @@
+name: run-terraform-apply-on-dispatch
+on:
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  run-terraform-apply:
+    name: Run Terraform apply
+    uses: ./.github/workflows/run-terraform-command.yml
+    with:
+      terraform-command: terraform destroy -auto-approve
+      aws-region: ${{ vars.AWS_REGION }}
+    secrets:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
