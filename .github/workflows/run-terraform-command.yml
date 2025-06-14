@@ -5,6 +5,15 @@ on:
       terraform-command:
         required: true
         type: string
+      aws-region:
+        required: true
+        type: string
+      aws-access-key-id:
+        required: true
+        type: string
+      aws-secret-access-key:
+        required: true
+        type: string
 jobs:
   run-terraform-command:
     name: Run Terraform command
@@ -19,14 +28,14 @@ jobs:
         id: describe-cloudformation-stack
         uses: ./.github/actions/describe-cloudformation-stack
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-region: ${{ vars.AWS_REGION }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ inputs.aws-access-key-id }}
+          aws-region: ${{ inputs.aws-region }}
+          aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
           stack-name: ${{ steps.get-cloudformation-stack-name.outputs.stack-name }}
       - name: Run Terraform apply
         uses: ./.github/actions/configure-terraform-and-run-command
         with:
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ inputs.aws-region }}
           terraform-command: ${{ inputs.terraform-command }}
           terraform-directory: ./terraform
           terraform-execution-role-arn: ${{ steps.describe-cloudformation-stack.outputs.terraform-execution-role-arn }}
