@@ -23,7 +23,4 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
     - name: Execute AWS CLI command
       shell: bash
-      run: |
-        echo "${{ inputs.command }}" > temp-cmd.sh
-        chmod +x temp-cmd.sh
-        ./temp-cmd.sh
+      run: ${{ inputs.command }}

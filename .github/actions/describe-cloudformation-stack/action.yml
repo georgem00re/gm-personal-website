@@ -15,7 +15,7 @@ inputs:
 outputs:
   terraform-execution-role-arn:
     description: "The ARN of the Terraform execution IAM role"
-    value: ${{ steps.describe-cloudformation-stack.outputs.terraform-execution-role-arn }}
+    value: 'something'
   terraform-state-bucket-name:
     description: "The name of the S3 bucket that stores the Terraform state file"
     value: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-bucket-name }}
