@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Resources required to bootstrap Terraform backend (S3 + DynamoDB + IAM)"
+
+Parameters:
+  RepositoryName:
+    Type: String
+  RepositoryOwner:
+    Type: String
+
+Resources:
+  # S3 bucket responsible for storing Terraform state (.tfstate) files.
+  TerraformStateBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${RepositoryOwner}-${RepositoryName}-tf-state"
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # DynamoDB table used by Terraform for state locking.
+  TerraformStateLockTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${RepositoryOwner}-${RepositoryName}-tf-state-lock"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: LockID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: LockID
+          KeyType: HASH
+
+  # OIDC provider that allows GitHub Actions to authenticate via federated identity.
+  GitHubOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      # A thumbprint is mandatory, but it won't be used at all, so we just set it to fff as suggested by github.
+      ThumbprintList:
+        - ffffffffffffffffffffffffffffffffffffffff
+
+  # IAM role assumed by GitHub Actions via OIDC to run Terraform and deploy AWS infrastructure.
+  TerraformExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: TerraformExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubOIDCProvider
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub "repo:${RepositoryOwner}/${RepositoryName}:*"
+              StringEquals:
+                token.actions.githubusercontent.com:aud: "sts.amazonaws.com"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess # Replace with custom policy if needed
+Outputs:
+  TerraformExecutionRoleArn:
+    Value: !GetAtt TerraformExecutionRole.Arn
+  TerraformStateBucketName:
+    Value: !Ref TerraformStateBucket
+  TerraformStateLockTableName:
+    Value: !Ref TerraformStateLockTable
