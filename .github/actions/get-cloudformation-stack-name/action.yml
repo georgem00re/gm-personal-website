@@ -1,7 +1,7 @@
 name: "Get CloudFormation stack name"
 outputs:
   stack-name:
-    description: ""
+    description: "The name of the CloudFormation stack"
     value: ${{ steps.output-cloudformation-stack-name.outputs.stack-name }}
 runs:
   using: "composite"
