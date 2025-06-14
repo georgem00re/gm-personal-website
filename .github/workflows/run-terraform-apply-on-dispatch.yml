@@ -1,0 +1,26 @@
+name: run-terraform-apply-on-dispath
+on:
+  workflow_dispatch:
+jobs:
+  run-terraform-apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get CloudFormation stack name
+        id: get-cloudformation-stack-name
+        uses: ./.github/actions/get-cloudformation-stack-name
+      - name: Describe CloudFormation stack
+        id: describe-cloudformation-stack
+        uses: ./.github/actions/describe-cloudformation-stack
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          stack-name: ${{ steps.get-cloudformation-stack-name.outputs.stack-name }}
+      - name: Run Terraform apply
+        uses: ./.github/workflows/run-terraform-command.yml
+        with:
+          terraform-execution-role-arn: ${{ steps.describe-cloudformation-stack.outputs.terraform-execution-role-arn }}
+          terraform-command: terraform apply -auto-approve
+          aws-region: ${{ vars.AWS_REGION }}
+          terraform-state-bucket-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-bucket-name }}
+          terraform-state-lock-table-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-lock-table-name }}

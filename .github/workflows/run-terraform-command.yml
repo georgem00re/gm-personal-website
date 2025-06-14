@@ -1,0 +1,35 @@
+name: run-terraform-command
+on:
+  workflow_call:
+    inputs:
+      terraform-execution-role-arn:
+        required: true
+        type: string
+      aws-region:
+        required: true
+        type: string
+      terraform-state-bucket-name:
+        required: true
+        type: string
+      terraform-state-lock-table-name:
+        required: true
+        type: string
+      terraform-command:
+        required: true
+        type: string
+jobs:
+  run-terraform-command:
+    name: Run Terraform command
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run Terraform command
+        uses: ./.github/actions/configure-terraform-and-run-command
+        with:
+          aws-region: ${{ inputs.aws-region }}
+          terraform-execution-role-arn: ${{ inputs.terraform-execution-role-arn }}
+          terraform-command: ${{ inputs.terraform-command }}
+          terraform-state-bucket-name: ${{ inputs.terraform-state-bucket-name }}
+          terraform-state-lock-table-name: ${{ inputs.terraform-state-lock-table-name }}
+          terraform-directory: ./terraform
