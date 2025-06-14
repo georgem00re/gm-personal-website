@@ -1,6 +1,9 @@
 name: run-terraform-apply-on-dispatch
 on:
   workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
 jobs:
   run-terraform-apply:
     name: Run Terraform apply
