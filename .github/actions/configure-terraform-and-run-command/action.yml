@@ -23,6 +23,9 @@ runs:
   steps:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
+    - name: Get repository name and owner
+      id: get-repository-name-and-owner
+      uses: ./.github/actions/get-repository-name-and-owner
     - name: Configure AWS credentials using OIDC
       uses: aws-actions/configure-aws-credentials@v3
       with:
@@ -36,6 +39,6 @@ runs:
       shell: bash
       working-directory: ${{ inputs.terraform-directory }}
     - name: Run Terraform command
-      run: ${{ inputs.terraform-command }}
+      run: ${{ inputs.terraform-command }} -var="ORGANISATION_NAME=${{ steps.get-repository-name-and-owner.outputs.repository-owner }}" -var="REPOSITORY_NAME=${{ steps.get-repository-name-and-owner.outputs.repository-name }}"
       working-directory: ${{ inputs.terraform-directory }}
       shell: bash
