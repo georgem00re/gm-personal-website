@@ -17,13 +17,15 @@ terraform {
 
 provider "aws" {}
 
-module "aws_iam_openid_connect_provider" {
-  source = "./modules/aws_iam_openid_connect_provider"
+// Because an OIDC provider for GitHub Actions has already been created (in the CloudFormation templates),
+// we can use a data block to reference the existing provider rather than attempting to recreate it.
+data "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
 }
 
 module "aws_iam_policy_document" {
   source                      = "./modules/aws_iam_policy_document"
-  openid_connect_provider_arn = module.aws_iam_openid_connect_provider.arn
+  openid_connect_provider_arn = data.aws_iam_openid_connect_provider.github.arn
   organisation_name           = var.ORGANISATION_NAME
   repository_name             = var.REPOSITORY_NAME
 }
