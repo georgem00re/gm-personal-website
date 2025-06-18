@@ -18,8 +18,8 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           stack-name: ${{ steps.get-cloudformation-stack-name.outputs.stack-name }}
-      - name: Describe Terraform infrastructure
-        uses: ./.github/actions/describe-terraform-infrastructure
+      - name: Get Terraform outputs
+        uses: ./.github/actions/get-terraform-outputs
         with:
           terraform-directory: ./terraform
           terraform-state-bucket-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-bucket-name }}
