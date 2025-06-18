@@ -1,0 +1,23 @@
+name: describe-terraform-infrastructure-on-dispatch
+on:
+  workflow_dispatch:
+jobs:
+  describe-terraform-infrastructure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v3.3.0
+      - name: Describe CloudFormation stack
+        id: describe-cloudformation-stack
+        uses: ./.github/actions/describe-cloudformation-stack
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          stack-name: ${{ steps.get-cloudformation-stack-name.outputs.stack-name }}
+      - name: Describe Terraform infrastructure
+        uses: ./.github/actions/describe-terraform-infrastructure
+        with:
+          terraform-directory: ./terraform
+          terraform-state-bucket-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-bucket-name }}
+          terraform-state-lock-table-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-lock-table-name }}
