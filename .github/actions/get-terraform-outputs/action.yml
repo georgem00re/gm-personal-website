@@ -9,6 +9,13 @@ inputs:
   terraform-directory:
     description: "The directory where the Terraform command will be executed"
     required: true
+outputs:
+  s3-bucket-name:
+    description: "The name of the S3 bucket hosting the React app"
+    value: ${{ steps.get-terraform-outputs.outputs.s3-bucket-name }}
+  s3-bucket-role-arn:
+    description: "The ARN of the IAM role that can make changes to files in the S3 bucket"
+    value: ${{ steps.get-terraform-outputs.outputs.s3-bucket-role-arn }}
 runs:
   using: "composite"
   steps:
@@ -22,6 +29,11 @@ runs:
           -backend-config="dynamodb_table=${{ inputs.terraform-state-lock-table-name }}" \
       working-directory: ${{ inputs.terraform-directory }}
     - name: Get Terraform outputs
-      run: terraform output
+      id: get-terraform-outputs
       working-directory: ${{ inputs.terraform-directory }}
       shell: bash
+      run: |
+        S3_BUCKET_NAME=$(terraform output -raw S3_BUCKET_NAME)
+        S3_BUCKET_ROLE_ARN=$(terraform output -raw S3_BUCKET_ROLE_ARN)
+        echo "s3-bucket-name=$S3_BUCKET_NAME" >> $GITHUB_OUTPUT
+        echo "s3-bucket-role-arn=$S3_BUCKET_ROLE_ARN" >> $GITHUB_OUTPUT

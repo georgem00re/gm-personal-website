@@ -19,8 +19,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           stack-name: ${{ steps.get-cloudformation-stack-name.outputs.stack-name }}
       - name: Get Terraform outputs
+        id: get-terraform-outputs
         uses: ./.github/actions/get-terraform-outputs
         with:
           terraform-directory: ./terraform
           terraform-state-bucket-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-bucket-name }}
           terraform-state-lock-table-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-lock-table-name }}
+      - name: Echo Terraform outputs
+        run: |
+          echo "s3-bucket-name=${{ steps.get-terraform-outputs.outputs.s3-bucket-name }}"
+          echo "s3-bucket-role-arn=${{ steps.get-terraform-outputs.outputs.s3-bucket-role-arn }}"
