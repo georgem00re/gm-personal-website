@@ -33,7 +33,7 @@ runs:
       working-directory: ${{ inputs.terraform-directory }}
       shell: bash
       run: |
-        S3_BUCKET_NAME=$(terraform output -raw S3_BUCKET_NAME)
-        S3_BUCKET_ROLE_ARN=$(terraform output -raw S3_BUCKET_ROLE_ARN)
+        S3_BUCKET_NAME=$(terraform output -raw s3_bucket_name)
+        S3_BUCKET_ROLE_ARN=$(terraform output -raw s3_bucket_role_arn)
         echo "s3-bucket-name=$S3_BUCKET_NAME" >> $GITHUB_OUTPUT
         echo "s3-bucket-role-arn=$S3_BUCKET_ROLE_ARN" >> $GITHUB_OUTPUT
