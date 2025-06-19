@@ -1,0 +1,16 @@
+name: "Assume IAM role"
+inputs:
+  iam-role-arn:
+    description: "The ARN of the IAM role to assume"
+    required: true
+  aws-region:
+    description: "The AWS region your CLI calls will use after assuming the role"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Configure AWS credentials using OIDC
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: ${{ inputs.iam-role-arn }}
+        aws-region: ${{ inputs.aws-region }}

@@ -1,0 +1,15 @@
+name: push-react-app-to-s3-bucket-on-dispatch
+on:
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  push-react-app-to-s3-bucket:
+    name: Push React app to S3 bucket
+    uses: ./.github/workflows/push-react-app-to-s3-bucket.yml
+    with:
+      aws-region: ${{ vars.AWS_REGION }}
+    secrets:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

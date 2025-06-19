@@ -1,0 +1,51 @@
+name: push-react-app-to-s3-bucket
+on:
+  workflow_call:
+    inputs:
+      aws-region:
+        required: true
+        type: string
+    secrets:
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v3.3.0
+      - name: Set up NodeJS version 18
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 18
+      - name: Build React app
+        run: npm ci && npm run build
+        working-directory: ./react-app
+      - name: Get CloudFormation stack name
+        id: get-cloudformation-stack-name
+        uses: ./.github/actions/get-cloudformation-stack-name
+      - name: Describe CloudFormation stack
+        id: describe-cloudformation-stack
+        uses: ./.github/actions/describe-cloudformation-stack
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-region: ${{ inputs.aws-region }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          stack-name: ${{ steps.get-cloudformation-stack-name.outputs.stack-name }}
+      - name: Get Terraform outputs
+        id: get-terraform-outputs
+        uses: ./.github/actions/get-terraform-outputs
+        with:
+          terraform-directory: ./terraform
+          terraform-state-bucket-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-bucket-name }}
+          terraform-state-lock-table-name: ${{ steps.describe-cloudformation-stack.outputs.terraform-state-lock-table-name }}
+      - name: Assume S3 bucket IAM role
+        uses: ./.github/actions/assume-iam-role
+        with:
+          aws-region: ${{ inputs.aws-region }}
+          iam-role-arn: ${{ steps.get-terraform-outputs.outputs.s3-bucket-role-arn }}
+      - name: Push React app to S3 bucket
+        run: aws s3 sync . s3://${{ steps.get-terraform-outputs.outputs.s3-bucket-name }}
+        working-directory: ./react-app/dist/
