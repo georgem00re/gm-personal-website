@@ -4,3 +4,8 @@ frontend-start:
 
 terraform-fmt:
 	terraform -chdir=terraform fmt --recursive
+
+# To deploy the Terraform infrastructure locally, you must first
+# remove the 'backend "s3"' block from terraform/main.tf.
+terraform-init:
+	terraform -chdir=terraform init
