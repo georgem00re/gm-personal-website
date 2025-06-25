@@ -3,6 +3,9 @@ include .env
 frontend-start:
 	NVM_DIR="$${HOME}/.nvm" && . "$${NVM_DIR}/nvm.sh" && cd react-app && nvm use && npm run dev
 
+# Local infrastructure commands for faster dev — skip CI and use local backend to deploy/test infrastructure
+# very quickly. For Terraform, you must first remove the 'backend "s3"' block from main.tf before running.
+
 cloudformation-deploy-stack:
 	aws cloudformation deploy \
 	  --stack-name $(CLOUDFORMATION_STACK_NAME) \
@@ -23,8 +26,7 @@ cloudformation-delete-stack:
 terraform-fmt:
 	terraform -chdir=terraform fmt --recursive
 
-# To deploy the Terraform infrastructure locally, you must first
-# remove the 'backend "s3"' block from terraform/main.tf.
+# Remove the 'backend "s3"' block from terraform/main.tf before running.
 terraform-init:
 	terraform -chdir=terraform init
 
