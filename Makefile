@@ -34,3 +34,13 @@ terraform-plan:
 	AWS_REGION=$(AWS_REGION) AWS_PROFILE=$(AWS_PROFILE) terraform -chdir=terraform plan \
 		-var="ORGANISATION_NAME=$(ORGANISATION_NAME)" \
 		-var="REPOSITORY_NAME=$(REPOSITORY_NAME)"
+
+terraform-apply:
+	AWS_REGION=$(AWS_REGION) AWS_PROFILE=$(AWS_PROFILE) terraform -chdir=terraform apply \
+		-var="ORGANISATION_NAME=$(ORGANISATION_NAME)" \
+		-var="REPOSITORY_NAME=$(REPOSITORY_NAME)"
+
+terraform-destroy:
+	AWS_REGION=$(AWS_REGION) AWS_PROFILE=$(AWS_PROFILE) terraform -chdir=terraform destroy \
+		-var="ORGANISATION_NAME=$(ORGANISATION_NAME)" \
+		-var="REPOSITORY_NAME=$(REPOSITORY_NAME)"
