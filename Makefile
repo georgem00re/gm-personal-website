@@ -44,3 +44,6 @@ terraform-destroy:
 	AWS_REGION=$(AWS_REGION) AWS_PROFILE=$(AWS_PROFILE) terraform -chdir=terraform destroy \
 		-var="ORGANISATION_NAME=$(ORGANISATION_NAME)" \
 		-var="REPOSITORY_NAME=$(REPOSITORY_NAME)"
+
+terraform-output:
+	terraform -chdir=terraform output
