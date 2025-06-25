@@ -38,20 +38,25 @@ resource "aws_s3_bucket_acl" "this" {
 resource "aws_s3_bucket_policy" "this" {
   bucket = aws_s3_bucket.this.id
   policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [{
-      "Effect" : "Allow",
-      "Principal" : "*",
-      "Action" : "s3:GetObject",
-      "Resource" : "${aws_s3_bucket.this.arn}/*"
-      }, {
-      "Effect" : "Allow",
-      "Principal" : {
-        "AWS" : var.can_put_and_delete
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "${aws_s3_bucket.this.arn}/*"
       },
-      "Action" : ["s3:PutObject", "s3:DeleteObject"],
-      "Resource" : "${aws_s3_bucket.this.arn}/*"
-    }]
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = var.can_put_and_delete
+        }
+        Action   = ["s3:PutObject", "s3:DeleteObject"]
+        Resource = "${aws_s3_bucket.this.arn}/*"
+      }
+    ]
   })
-  depends_on = [aws_s3_bucket_acl.this]
+  depends_on = [
+    aws_s3_bucket_acl.this
+  ]
 }
