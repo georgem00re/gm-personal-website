@@ -39,3 +39,7 @@ module "aws_s3_bucket" {
   source             = "./modules/aws_s3_bucket"
   can_put_and_delete = module.aws_iam_role.arn
 }
+
+module "aws_cloudfront_origin_access_identity" {
+  source = "./modules/aws_cloudfront_origin_access_identity"
+}
