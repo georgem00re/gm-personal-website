@@ -4,3 +4,5 @@ node_modules/
 .terraform.lock.hcl
 .terraform/
 .env
+terraform.tfstate
+terraform.tfstate.backup
