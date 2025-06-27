@@ -47,3 +47,9 @@ terraform-destroy:
 
 terraform-output:
 	terraform -chdir=terraform output
+
+build-react-app:
+	NVM_DIR="$${HOME}/.nvm" && . "$${NVM_DIR}/nvm.sh" && cd react-app && nvm use && npm run build
+
+push-react-app-to-s3-bucket:
+	aws s3 sync react-app/dist/ s3://$$(terraform -chdir=terraform output -raw s3_bucket_name) --region $(AWS_REGION) --profile $(AWS_PROFILE)
