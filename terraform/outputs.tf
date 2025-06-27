@@ -10,3 +10,7 @@ output "s3_bucket_role_arn" {
 output "cloudfront_distribution_domain_name" {
   value = module.aws_cloudfront_distribution.domain_name
 }
+
+output "cloudfront_distribution_id" {
+  value = module.aws_cloudfront_distribution.id
+}

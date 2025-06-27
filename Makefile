@@ -52,4 +52,13 @@ build-react-app:
 	NVM_DIR="$${HOME}/.nvm" && . "$${NVM_DIR}/nvm.sh" && cd react-app && nvm use && npm run build
 
 push-react-app-to-s3-bucket:
-	aws s3 sync react-app/dist/ s3://$$(terraform -chdir=terraform output -raw s3_bucket_name) --region $(AWS_REGION) --profile $(AWS_PROFILE)
+	aws s3 sync react-app/dist/ s3://$$(terraform -chdir=terraform output -raw s3_bucket_name) \
+		--region $(AWS_REGION) \
+		--profile $(AWS_PROFILE)
+
+invalidate-cloudfront-distribution:
+	aws cloudfront create-invalidation \
+	  --distribution-id $$(terraform -chdir=terraform output -raw cloudfront_distribution_id) \
+	  --paths "/*" \
+	  --region $(AWS_REGION) \
+	  --profile $(AWS_PROFILE)
